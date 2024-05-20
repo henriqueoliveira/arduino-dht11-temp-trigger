@@ -15,22 +15,16 @@ void setup () {
 }
 
 void loop (){
-    unsigned long startTime = millis();
-    float H = dht.readHumidity(); 
-    float T = dht.readTemperature();
-    unsigned long endTime = millis();
 
-    // Check if any reads failed and if exit
-    if (isnan(H) || isnan(T)){
-      Serial.println("Failed to read from DHT sensor!");
-      return;
-    }
- 
-    // Combine Humidity and Temperature into single string
-    String dhtData = String(H) + "," + String(T);
-    Serial.println(dhtData);
+    for (int i = 0; i < 40; i++) {
+      unsigned long startTime = millis();
+      float humidity = dht.readHumidity();
+      float temperature = dht.readTemperature();
+      String dhtData = String(humidity) + "," + String(temperature);
+      Serial.println(dhtData);
 
-    if (Serial.available() > 0) {  // Verifica se há dados disponíveis para ler na serial
+      while (Serial.available() <= 0)
+      {}
       char command = Serial.read(); // Lê um caractere da serial
 
       if (command == '0') {
@@ -38,5 +32,14 @@ void loop (){
       } else if (command == '1') {
         digitalWrite(RELAY_PIN, LOW);  // Liga o relé
       }
-  }
+
+      unsigned long endTime = millis();
+      
+      Serial.print("Medição ");
+      Serial.print(i+1);
+      Serial.print(": ");
+      Serial.print(endTime - startTime);
+      Serial.println("ms ");
+      delay(2000); // Delay entre leituras para estabilidade
+    }
 }
