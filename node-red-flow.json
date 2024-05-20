@@ -1,0 +1,378 @@
+[
+    {
+        "id": "28098c54159917c8",
+        "type": "tab",
+        "label": "MonitoramentoAmbiental",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "0c108d6e4549e6ef",
+        "type": "mqtt-broker",
+        "name": "Mosquitto",
+        "broker": "mosquitto",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "6afd8d80c851e9c6",
+        "type": "serial-port",
+        "name": "/dev/ttyUSB0",
+        "serialport": "/dev/ttyUSB0",
+        "serialbaud": "9600",
+        "databits": "8",
+        "parity": "none",
+        "stopbits": "1",
+        "waitfor": "",
+        "dtr": "none",
+        "rts": "none",
+        "cts": "none",
+        "dsr": "none",
+        "newline": "\\n",
+        "bin": "false",
+        "out": "char",
+        "addchar": "",
+        "responsetimeout": "10000"
+    },
+    {
+        "id": "6e936930858057bd",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "5662ad520206e3ce",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "6c90782eee2569eb",
+        "type": "ui_group",
+        "name": "Temperatura/Humidade",
+        "tab": "6e936930858057bd",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "509649958e86d40f",
+        "type": "function",
+        "z": "28098c54159917c8",
+        "name": "Verificar temperatura",
+        "func": "var temperatura = msg.payload;\nvar m = msg.payload.split(',');\nvar H = parseFloat(m[0]);\nvar T = parseFloat(m[1]);\n\nvar last_temperature_status = context.get('last_temperature_status');\n\nif (T >= 28) {\n    if (last_temperature_status == 'high') {\n        return null;\n    }\n    context.set('last_temperature_status', 'high');\n    msg.payload = 'on';  // Ativar relé\n} else {\n    if (last_temperature_status == 'low') {\n        return null;\n    }\n    context.set('last_temperature_status', 'low');\n    msg.payload = 'off';  // Desativar relé\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 100,
+        "wires": [
+            [
+                "dcbb58ae9c18cfbb",
+                "7f29e610916f6f30"
+            ]
+        ]
+    },
+    {
+        "id": "7f29e610916f6f30",
+        "type": "debug",
+        "z": "28098c54159917c8",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "dcbb58ae9c18cfbb",
+        "type": "mqtt out",
+        "z": "28098c54159917c8",
+        "name": "Envio de dados",
+        "topic": "home/temperature/control",
+        "qos": "2",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "0c108d6e4549e6ef",
+        "x": 900,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "3e21505cf76ab9e8",
+        "type": "function",
+        "z": "28098c54159917c8",
+        "name": "Ativar/Desativar Relé",
+        "func": "// Recebe a mensagem MQTT\nvar command = msg.payload;\n\nvar relay_status = context.get('relay_status');\nif (relay_status != command) {\n    context.set('relay_status', command);\n} else {\n    return null;\n}\n\nif (command === \"on\") {\n    msg.payload = '1';\n} else if (command === \"off\") {\n    msg.payload = '0';\n} else {\n    return null;  // Retorna 'null' para parar o fluxo\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 520,
+        "wires": [
+            [
+                "daedbd0a82c0b164",
+                "7f29e610916f6f30"
+            ]
+        ]
+    },
+    {
+        "id": "dca172b376dfb788",
+        "type": "mqtt in",
+        "z": "28098c54159917c8",
+        "name": "Receptor",
+        "topic": "home/temperature/control",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "0c108d6e4549e6ef",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 240,
+        "y": 520,
+        "wires": [
+            [
+                "3e21505cf76ab9e8"
+            ]
+        ]
+    },
+    {
+        "id": "56e10ce99a7e840c",
+        "type": "serial in",
+        "z": "28098c54159917c8",
+        "name": "Arduino In",
+        "serial": "6afd8d80c851e9c6",
+        "x": 220,
+        "y": 140,
+        "wires": [
+            [
+                "509649958e86d40f",
+                "221a2df0143f29bb"
+            ]
+        ]
+    },
+    {
+        "id": "221a2df0143f29bb",
+        "type": "function",
+        "z": "28098c54159917c8",
+        "name": "Separar Dados",
+        "func": "m = msg.payload.split(',');\nH = { payload: parseFloat(m[0]) };\nT = { payload: parseFloat(m[1]) };\n\nreturn [H, T];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 5,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 280,
+        "wires": [
+            [
+                "72384459af767d2e"
+            ],
+            [
+                "6649aba7ef94fa94"
+            ]
+        ]
+    },
+    {
+        "id": "72384459af767d2e",
+        "type": "ui_gauge",
+        "z": "28098c54159917c8",
+        "name": "",
+        "group": "6c90782eee2569eb",
+        "order": 0,
+        "width": "4",
+        "height": "4",
+        "gtype": "gage",
+        "title": "Humidade",
+        "label": "units",
+        "format": "{{value}}%",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 610,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "6649aba7ef94fa94",
+        "type": "ui_gauge",
+        "z": "28098c54159917c8",
+        "name": "",
+        "group": "6c90782eee2569eb",
+        "order": 1,
+        "width": "4",
+        "height": "4",
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "units",
+        "format": "{{value}}C",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 610,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "daedbd0a82c0b164",
+        "type": "serial out",
+        "z": "28098c54159917c8",
+        "name": "Arduino Out",
+        "serial": "6afd8d80c851e9c6",
+        "x": 810,
+        "y": 520,
+        "wires": []
+    }
+]

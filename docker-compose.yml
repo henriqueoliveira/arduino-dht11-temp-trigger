@@ -1,0 +1,25 @@
+version: "3.7"
+
+services:
+  node-red:
+    build: .
+    container_name: node-red
+    environment:
+      - TZ=America/Sao_Paulo
+    ports:
+      - "1880:1880"
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    volumes:
+      - ./data:/data:z
+ 
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config:z
+      - ./mosquitto/data:/mosquitto/data:z
+      - ./mosquitto/log:/mosquitto/log:z
+    restart: unless-stopped
